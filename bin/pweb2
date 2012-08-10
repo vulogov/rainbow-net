@@ -1,0 +1,23 @@
+#!/bin/sh
+
+export PROOT=`cat /etc/rnet.conf | grep root_path | awk 'BEGIN{FS="="}{gsub(/\"/, "", $2); gsub(/\ /, "", $2); print $2}'|head -1`
+
+export PYTHONPATH=$PROOT/lib:$PYTHONPATH
+export PATH=$PROOT/bin:$PATH
+
+check_required_module()
+{
+   env python -c "import $1"
+   if [ $? -ne 0 ]; then
+      echo "Required module $1 is not found"
+      exit 1
+   fi
+}
+
+check_required_module sys
+check_required_module re
+check_required_module p2_opts
+
+PROG=`basename $0`
+
+env python $0.py $@
